@@ -81,12 +81,15 @@ func main() {
 		fmt.Printf("#%d %d (%d ns)\n", i, ret, elapsed)
 	}
 	fmt.Println("\nBig Loop style")
-	for i := 0; i <= 100; i++ {
+	for i := 0; i <= 1000; i++ {
 		start := time.Now()
 		ret := BigFibonacciLoop(i)
 		t := time.Now()
 		elapsed := t.Sub(start)
-		fmt.Printf("#%d %d (%d ns)\n", i, ret, elapsed)
+
+		if i%100 == 0 {
+			fmt.Printf("#%d %d (%d ns)\n", i, ret, elapsed)
+		}
 	}
 	fmt.Println("\nTail recursion style")
 	for i := 0; i <= 100; i++ {
@@ -94,7 +97,9 @@ func main() {
 		ret := FibonacciTailRecursion(uint64(i), 0, 1)
 		t := time.Now()
 		elapsed := t.Sub(start)
-		fmt.Printf("#%d %d (%d ns)\n", i, ret, elapsed)
+		if i%100 == 0 {
+			fmt.Printf("#%d %d (%d ns)\n", i, ret, elapsed)
+		}
 	}
 	fmt.Println("\nBig Tail recursion style")
 	for i := 0; i <= 1000; i++ {
@@ -102,11 +107,19 @@ func main() {
 		ret := BigFibonacciTailRecursion(i, big.NewInt(0), big.NewInt(1))
 		t := time.Now()
 		elapsed := t.Sub(start)
-		fmt.Printf("#%d %d (%d ns)\n", i, ret, elapsed)
+		if i%100 == 0 {
+			fmt.Printf("#%d %d (%d ns)\n", i, ret, elapsed)
+		}
 	}
 	fmt.Println("\nRegular recursion style")
 	for i := 0; i <= 100; i++ {
 		// delegate work, fill your CPUs. CAREFUL this will eat CPU
-		go fmt.Printf("%d ", FibonacciRecursion(uint64(i)))
+		start := time.Now()
+		ret := FibonacciRecursion(uint64(i))
+		t := time.Now()
+		elapsed := t.Sub(start)
+		if i%1 == 0 {
+			fmt.Printf("#%d %d (%d ns)\n", i, ret, elapsed)
+		}
 	}
 }
