@@ -8,6 +8,10 @@ class Node
     @right = right
   end
 
+  def inspect
+    "<#{object_id} #{value.inspect} #{left.inspect} #{right.inspect}>"
+  end
+
   def pre_order(values = [])
     if value.nil?
       return values
@@ -106,8 +110,9 @@ end
 
 class BinaryTree
   attr_accessor :root
-  def self.generate(depth)
 
+  def inspect
+    root.inspect
   end
 
   def initialize(root_node)
@@ -137,11 +142,61 @@ class BinaryTree
   end
 
   def delete(value)
+    node = search(value)
+    remove(node) if node
+  end
 
+  def remove(node)
+    puts "removing #{node.inspect}"
+    if node.left.nil? && node.right.nil?
+      node = nil
+    # if there's only a left node, replace
+    elsif !node.left.nil? && node.right.nil?
+      node = node.left
+    # if there's only a right node, replace
+    elsif node.left.nil? && !node.right.nil?
+      node = node.right
+    # delete using easy method
+    else
+      node = delete_node_with_two_children(node)
+    end
+    node
   end
 end
 
 class BinarySearchTree < BinaryTree
+  def delete_node_with_two_children(node)
+    # find the minimum node on the right
+    min_node, parent = find_min_node(node.right)
+    puts("min node under #{node.inspect} is #{min_node.inspect}, parent: #{parent.inspect}")
+    replace_value(node, min_node)
+    remove_min_node(min_node, parent)
+  end
+
+  # We must return the parent so we can delete the original node (which
+  # will now be a duplicate after we copy its value)
+  def find_min_node(node, parent = nil)
+    #require 'pry'
+    #binding.pry
+    if node.left.nil?
+      return node, parent
+    else
+      find_min_node(node.left, node)
+    end
+  end
+
+  def replace_value(old_node, new_node)
+    puts("replacing #{old_node.inspect} with #{new_node.inspect}")
+    old_node.value = new_node.value
+
+    # must delete old dangling node here
+  end
+
+  def remove_min_node(node, parent)
+    node = nil
+    parent.left = node
+  end
+
   def valid?(node)
     return invalid_nodes(node).size == 0
   end
