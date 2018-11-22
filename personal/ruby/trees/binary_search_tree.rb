@@ -142,19 +142,30 @@ class BinaryTree
 end
 
 class BinarySearchTree < BinaryTree
-  # check if this is a valid BST
-  def valid?(node, min=-1.0/0.0, max=1.0/0.0)
-    puts ("checking #{node.value}, left: #{node.left.nil?}, right: #{node.right.nil?}")
-    until node.left.nil? && node.right.nil?
-      puts "#{
-      if min > node.value || max < node.value
-        return false
-      else
-        valid?(node.left, min, node.value)
-        valid?(node.right, node.value, max)
-      end
+  def valid?(node)
+    return invalid_nodes(node).size == 0
+  end
+
+  # perform post-order validity check to ensure this is a BST tree.
+  # Returns array of "invalid" nodes.
+  def invalid_nodes(node, bad_nodes = [], min=-1.0/0.0, max=1.0/0.0)
+    # base case
+    return true if node.nil?
+
+    #puts ("checking #{node.value}, left: #{node.left.inspect}, right: #{node.right.inspect}, min: #{min}, max: #{max}, bad_nodes: #{bad_nodes}")
+
+    if node.value < min || node.value > max
+      bad_nodes << node.value
+      return false
     end
-    return true
+
+    invalid_nodes_left = invalid_nodes(node.left, bad_nodes, min, node.value)
+
+    # uncomment this if you want to fail fast
+    # return false unless left_valid
+
+    invalid_nodes_right = invalid_nodes(node.right, bad_nodes, node.value, max)
+
+    return bad_nodes
   end
 end
-

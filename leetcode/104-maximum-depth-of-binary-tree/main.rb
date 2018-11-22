@@ -1,3 +1,14 @@
+=begin
+Given binary tree [3,9,20,null,null,15,7],
+
+    3
+   / \
+  9  20
+    /  \
+   15   7
+return its depth = 3.
+=end
+
 class Node
   attr_accessor :value, :left, :right
   def initialize(value, left = nil, right = nil)

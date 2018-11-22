@@ -1,4 +1,4 @@
-require_relative "main"
+require_relative "binary_search_tree"
 
 describe BinaryTree do
   context "with a depth of 3" do
@@ -70,6 +70,12 @@ describe BinarySearchTree do
     describe "depth" do
       it "is correct" do
         expect(tree.depth).to eq(3)
+      end
+    end
+
+    describe "invalid_nodes" do
+      it "is correct" do
+        expect(tree.invalid_nodes(root)).to eq([9, 7])
       end
     end
 
