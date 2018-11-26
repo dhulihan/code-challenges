@@ -9,7 +9,7 @@ class Node
   end
 
   def inspect
-    "<#{object_id} #{value.inspect} #{left.inspect} #{right.inspect}>"
+    "<#{value.inspect} #{left.inspect} #{right.inspect}>"
   end
 
   def pre_order(values = [])
@@ -95,17 +95,6 @@ class Node
       right ? right.search(search_value) : nil
     end
   end
-
-  def search(search_value)
-    #puts "search_value: #{search_value}, current_value: #{value}"
-    if search_value == value
-      return self
-    elsif search_value < value
-      left ? left.search(search_value) : nil
-    elsif search_value > value
-      right ? right.search(search_value) : nil
-    end
-  end
 end
 
 class BinaryTree
@@ -141,6 +130,14 @@ class BinaryTree
     root.search(value)
   end
 
+  # Create a tree from a flat array.
+  # Example:  [3, 6, 2, 9, -1, 10]
+  # -1 represents empty node
+  def self.parse_flat_array(arr)
+    root = insert_level_order(arr)
+    new(root)
+  end
+
   def delete(value)
     node = search(value)
     remove(node) if node
@@ -161,6 +158,23 @@ class BinaryTree
       node = delete_node_with_two_children(node)
     end
     node
+  end
+
+  private
+
+  def self.insert_level_order(array, node = nil, i = 0)
+    if i < array.size
+      # a value of -1 means no node in this implementation
+      return nil if array[i] == -1
+
+      temp = Node.new(array[i])
+      node = temp
+
+      node.left = insert_level_order(array, node.left, i * 2 + 1)
+      node.right = insert_level_order(array, node.right, i * 2 + 2)
+    end
+
+    return node
   end
 end
 

@@ -1,6 +1,17 @@
 require_relative "binary_search_tree"
 
 describe BinaryTree do
+  describe "parse_flat_array" do
+    let(:input) { [3, 6, 2, 9, -1, 10] }
+
+    it "works as expected" do
+      root = described_class.parse_flat_array(input)
+      p root
+      expect(root.depth).to eq(3)
+    end
+
+  end
+
   context "with a depth of 3" do
     let(:n5) { Node.new(7) }
     let(:tree) do
