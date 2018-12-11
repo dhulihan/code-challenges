@@ -52,7 +52,7 @@ func TestFlipPancakes(t *testing.T) {
 		{[]byte("---"), []byte("+++"), nil},
 		{[]byte("+++"), []byte("---"), nil},
 		{[]byte("+++"), []byte("---"), nil},
-		//{[]byte("5"), []byte("5"), fmt.Errorf("Invalid pancake representation: %c", '5')},
+		{[]byte("5"), []byte("5"), fmt.Errorf("Invalid pancake representation: %c", '5')},
 	}
 
 	for _, test := range tests {
@@ -64,7 +64,9 @@ func TestFlipPancakes(t *testing.T) {
 		equal := bytes.Equal(test.In, test.Expected)
 
 		if err != test.Error {
-			t.Fatalf("expected error '%s', got '%s'", test.Error, err)
+			if err.Error() != test.Error.Error() {
+				t.Fatalf("expected error '%s', got '%s'", test.Error, err)
+			}
 		}
 
 		if !equal {
@@ -76,7 +78,7 @@ func TestFlipPancakes(t *testing.T) {
 
 func TestHappyFlips(t *testing.T) {
 	for _, test := range Cases() {
-		actual := HappyFlips(test.Pancakes)
+		actual, _ := HappyFlips(test.Pancakes)
 		if actual != test.Flips {
 			t.Fatalf("expected to flip %s %d times, got %d", test.Pancakes, test.Flips, actual)
 		}

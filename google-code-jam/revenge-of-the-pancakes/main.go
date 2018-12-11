@@ -38,7 +38,7 @@ func FlipPancakes(pancakes []byte) error {
 
 // HappyFlips returns the number of flips needed to flip pancakes
 // so happy face (+) is right side up. Reads left to right.
-func HappyFlips(pancakes string) int {
+func HappyFlips(pancakes string) (int, error) {
 	chars := []byte(pancakes)
 
 	// position of the flip
@@ -61,11 +61,19 @@ TraversePancakes:
 			if chars[i] == SAD && nextPancake == HAPPY {
 				fmt.Printf("Stopping at i: %d, flips: %d\n", i, flips)
 
+				// Determine end of subslice to flip
+				var end int
 				if len(chars) <= 1 {
-					FlipPancakes(chars[:len(chars)])
+					end = len(chars)
 				} else {
-					fmt.Printf("Flipping %s\n", chars[:i+1])
-					FlipPancakes(chars[:i+1])
+					end = i + 1
+				}
+
+				fmt.Printf("Flipping %s\n", chars[:end])
+				err := FlipPancakes(chars[:end])
+
+				if err != nil {
+					return -1, err
 				}
 
 				// reset
@@ -77,9 +85,17 @@ TraversePancakes:
 		break
 	}
 
-	return flips
+	return flips, nil
 }
 
 func main() {
-	//cases := Cases()
+	for i, c := range Cases() {
+		flips, err := HappyFlips(c.Pancakes)
+
+		if err != nil {
+			continue
+		}
+
+		fmt.Printf("Case #%d: %d\n", i+1, flips)
+	}
 }
