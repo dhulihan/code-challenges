@@ -3,17 +3,23 @@ package main
 import "fmt"
 
 const (
-	HAPPY = '+'
-	SAD   = '-'
+	// Happy defines the char for a happy pancake
+	Happy = '+'
+
+	// Sad defines the char for a sad/upside-down pancake
+	Sad = '-'
+
+	// DebugMode determines if we should print debug information
+	DebugMode = false
 )
 
 // FlipPancake simply inverts a pancake
 func FlipPancake(pancake byte) (byte, error) {
 	switch pancake {
-	case HAPPY:
-		return SAD, nil
-	case SAD:
-		return HAPPY, nil
+	case Happy:
+		return Sad, nil
+	case Sad:
+		return Happy, nil
 	default:
 		return '?', fmt.Errorf("Invalid pancake representation: %c", pancake)
 	}
@@ -31,8 +37,6 @@ func FlipPancakes(pancakes []byte) error {
 		pancakes[i] = ret
 	}
 
-	//fmt.Printf("Original pancakes: %s, new pancakes: %s\n", pancakes, pancakes)
-
 	return nil
 }
 
@@ -47,19 +51,19 @@ func HappyFlips(pancakes string) (int, error) {
 
 TraversePancakes:
 	for {
-		fmt.Printf("\nGiven %s\n", chars)
+		debugf("\nGiven %s\n", chars)
 		for i := range chars {
 
 			if i < len(chars)-1 {
 				nextPancake = chars[i+1]
 			} else {
-				nextPancake = HAPPY
+				nextPancake = Happy
 			}
 
-			//fmt.Printf("i: %d nextPancake: %c, currPancake: %c\n", i, nextPancake, chars[i])
+			debugf("i: %d nextPancake: %c, currPancake: %c\n", i, nextPancake, chars[i])
 			// if we hit a sad pancake
-			if chars[i] == SAD && nextPancake == HAPPY {
-				fmt.Printf("Stopping at i: %d, flips: %d\n", i, flips)
+			if chars[i] == Sad && nextPancake == Happy {
+				debugf("Stopping at i: %d, flips: %d\n", i, flips)
 
 				// Determine end of subslice to flip
 				var end int
@@ -69,7 +73,7 @@ TraversePancakes:
 					end = i + 1
 				}
 
-				fmt.Printf("Flipping %s\n", chars[:end])
+				debugf("Flipping %s\n", chars[:end])
 				err := FlipPancakes(chars[:end])
 
 				if err != nil {
@@ -78,7 +82,7 @@ TraversePancakes:
 
 				// reset
 				flips++
-				fmt.Printf("Trying again with %s\n", chars)
+				debugf("Trying again with %s\n", chars)
 				continue TraversePancakes
 			}
 		}
@@ -88,8 +92,46 @@ TraversePancakes:
 	return flips, nil
 }
 
+type Case struct {
+	Description string
+	Pancakes    string
+	Flips       int
+}
+
+// Cases returns a list of cases
+func Cases() []Case {
+	return []Case{
+		Case{
+			Description: "one upside down pancake",
+			Pancakes:    "-",
+			Flips:       1,
+		},
+		Case{
+			Description: "two pancakes, top upside down",
+			Pancakes:    "-+",
+			Flips:       1,
+		},
+		Case{
+			Description: "two pancakes",
+			Pancakes:    "+-",
+			Flips:       2,
+		},
+		Case{
+			Description: "all happy pancakes",
+			Pancakes:    "+++",
+			Flips:       0,
+		},
+		Case{
+			Description: "one happy in the middle",
+			Pancakes:    "--+-",
+			Flips:       3,
+		},
+	}
+}
+
 func main() {
-	for i, c := range Cases() {
+	cases := Cases()
+	for i, c := range cases {
 		flips, err := HappyFlips(c.Pancakes)
 
 		if err != nil {
@@ -97,5 +139,12 @@ func main() {
 		}
 
 		fmt.Printf("Case #%d: %d\n", i+1, flips)
+	}
+}
+
+// cute debug function
+func debugf(format string, vals ...interface{}) {
+	if DebugMode {
+		fmt.Printf(format, vals...)
 	}
 }
