@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
 
 const (
 	// Happy defines the char for a happy pancake
@@ -10,7 +14,7 @@ const (
 	Sad = '-'
 
 	// DebugMode determines if we should print debug information
-	DebugMode = false
+	DebugMode = true
 )
 
 // FlipPancake simply inverts a pancake
@@ -21,6 +25,7 @@ func FlipPancake(pancake byte) (byte, error) {
 	case Sad:
 		return Happy, nil
 	default:
+		debugf("Got an error during FlipPancake: %s\n", "INVALID CHAR")
 		return '?', fmt.Errorf("Invalid pancake representation: %c", pancake)
 	}
 }
@@ -31,6 +36,7 @@ func FlipPancakes(pancakes []byte) error {
 		ret, err := FlipPancake(pancakes[i])
 
 		if err != nil {
+			debugf("Got an error during FlipPancakes: %s\n", err)
 			return err
 		}
 
@@ -77,6 +83,7 @@ TraversePancakes:
 				err := FlipPancakes(chars[:end])
 
 				if err != nil {
+					debugf("Got an error: %s\n", err)
 					return -1, err
 				}
 
@@ -92,53 +99,22 @@ TraversePancakes:
 	return flips, nil
 }
 
-type Case struct {
-	Description string
-	Pancakes    string
-	Flips       int
-}
-
-// Cases returns a list of cases
-func Cases() []Case {
-	return []Case{
-		Case{
-			Description: "one upside down pancake",
-			Pancakes:    "-",
-			Flips:       1,
-		},
-		Case{
-			Description: "two pancakes, top upside down",
-			Pancakes:    "-+",
-			Flips:       1,
-		},
-		Case{
-			Description: "two pancakes",
-			Pancakes:    "+-",
-			Flips:       2,
-		},
-		Case{
-			Description: "all happy pancakes",
-			Pancakes:    "+++",
-			Flips:       0,
-		},
-		Case{
-			Description: "one happy in the middle",
-			Pancakes:    "--+-",
-			Flips:       3,
-		},
-	}
-}
-
 func main() {
-	cases := Cases()
-	for i, c := range cases {
-		flips, err := HappyFlips(c.Pancakes)
+	scanner := bufio.NewScanner(os.Stdin)
+	n := 1
+
+	for scanner.Scan() {
+		text := scanner.Text()
+
+		flips, err := HappyFlips(text)
 
 		if err != nil {
+			debugf("Got an error: %s\n", err)
 			continue
 		}
 
-		fmt.Printf("Case #%d: %d\n", i+1, flips)
+		fmt.Printf("Case #%d: %d\n", n, flips)
+		n++
 	}
 }
 
