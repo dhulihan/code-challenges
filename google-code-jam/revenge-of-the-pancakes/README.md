@@ -46,7 +46,7 @@ Small dataset
 Large dataset
 1 ≤ length of S ≤ 100.
 
-###Sample
+### Sample
 
 ```
 Input
@@ -56,6 +56,7 @@ Input
 +­
 +++
 ­­+­
+
 Output
 Case #1: 1
 Case #2: 1

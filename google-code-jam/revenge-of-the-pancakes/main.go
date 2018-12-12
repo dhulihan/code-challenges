@@ -12,9 +12,6 @@ const (
 
 	// Sad defines the char for a sad/upside-down pancake
 	Sad = '-'
-
-	// DebugMode determines if we should print debug information
-	DebugMode = false
 )
 
 // Check that pancake representation is valid
@@ -52,7 +49,9 @@ func FlipPancakes(pancakes []byte) error {
 }
 
 // HappyFlips returns the number of flips needed to flip pancakes
-// so happy face (+) is right side up. Reads left to right.
+// so happy face (+) is right side up. Reads left to right. This approach
+// modifies the underlying array, so no additional data/copies of the array
+// need to be created.
 func HappyFlips(stack string) (int, error) {
 	pancakes := []byte(stack)
 
@@ -63,7 +62,6 @@ func HappyFlips(stack string) (int, error) {
 
 TraversePancakes:
 	for {
-		debugf("\nGiven %s\n", pancakes)
 		for i := range pancakes {
 			// validate pancake
 			err = validatePancake(pancakes[i])
@@ -79,12 +77,9 @@ TraversePancakes:
 				nextPancake = Happy
 			}
 
-			debugf("i: %d, nextPancake: %c, currPancake: %c\n", i, nextPancake, pancakes[i])
 			// if we hit a sad pancake
 			if pancakes[i] == Sad && nextPancake == Happy {
-				debugf("Stopping at i: %d, flips: %d\n", i, flips)
-
-				// Determine end of subslice to flip
+				// Determine subslice range that we'll be flipping
 				var end int
 				if len(pancakes) <= 1 {
 					end = len(pancakes)
@@ -92,12 +87,9 @@ TraversePancakes:
 					end = i + 1
 				}
 
-				debugf("Flipping %s\n", pancakes[:end])
 				FlipPancakes(pancakes[:end])
 
-				// reset
 				flips++
-				debugf("Trying again with %s\n", pancakes)
 				continue TraversePancakes
 			}
 		}
@@ -108,6 +100,7 @@ TraversePancakes:
 }
 
 func main() {
+	// Read pancakes on a per-line basis from stdin.
 	scanner := bufio.NewScanner(os.Stdin)
 	n := 1
 
@@ -116,20 +109,11 @@ func main() {
 
 		flips, err := HappyFlips(text)
 
-		debugf("Got an error: %s\n", err)
 		if err != nil {
-			debugf("Got an error: %s\n", err)
 			continue
 		}
 
 		fmt.Printf("Case #%d: %d\n", n, flips)
 		n++
-	}
-}
-
-// cute debug function
-func debugf(format string, vals ...interface{}) {
-	if DebugMode {
-		fmt.Printf(format, vals...)
 	}
 }
