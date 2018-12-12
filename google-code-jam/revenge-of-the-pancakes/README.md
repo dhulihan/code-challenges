@@ -1,4 +1,4 @@
-# Revenge of the Pancakes
+# Revenge of the Pancakes (by Dave Hulihan)
 
 ## How to run
 
@@ -7,17 +7,19 @@
 go run main.go
 
 # input from command
-echo "-+-" | go run main.go
+echo "--+-" | go run main.go
 
 # Input from file
-cat B-small-practice.in | go run main.go
+echo "--+-" > pancakes.txt
+echo "++--" >> pancakes.txt
+cat pancakes.txt | go run main.go
 ```
 
 ## The challenge
 
 This problem came from a Google Code Jam project that was made available online in 2016. Feel free to use the language you feel most comfortable in, but Go is our preferred language if you are able to use it.
 
-Problem
+### Problem
 
 The Infinite House of Pancakes has just introduced a new kind of pancake! It has a happy face made of chocolate chips on one side (the "happy side"), and nothing on the other side (the "blank side").
 
