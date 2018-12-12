@@ -14,32 +14,37 @@ const (
 	Sad = '-'
 
 	// DebugMode determines if we should print debug information
-	DebugMode = true
+	DebugMode = false
 )
 
-// FlipPancake simply inverts a pancake
-func FlipPancake(pancake byte) (byte, error) {
+// Check that pancake representation is valid
+func validatePancake(pancake byte) error {
 	switch pancake {
 	case Happy:
-		return Sad, nil
+		return nil
 	case Sad:
-		return Happy, nil
+		return nil
 	default:
-		debugf("Got an error during FlipPancake: %s\n", "INVALID CHAR")
-		return '?', fmt.Errorf("Invalid pancake representation: %c", pancake)
+		return fmt.Errorf("Invalid pancake representation: %c", pancake)
+	}
+}
+
+// FlipPancake simply inverts a pancake
+func FlipPancake(pancake byte) byte {
+	switch pancake {
+	case Happy:
+		return Sad
+	case Sad:
+		return Happy
+	default:
+		panic(fmt.Sprintf("Cannot flip a %c pancake", pancake))
 	}
 }
 
 // FlipPancakes performs an in-place modification of slice
 func FlipPancakes(pancakes []byte) error {
 	for i := range pancakes {
-		ret, err := FlipPancake(pancakes[i])
-
-		if err != nil {
-			debugf("Got an error during FlipPancakes: %s\n", err)
-			return err
-		}
-
+		ret := FlipPancake(pancakes[i])
 		pancakes[i] = ret
 	}
 
@@ -48,48 +53,51 @@ func FlipPancakes(pancakes []byte) error {
 
 // HappyFlips returns the number of flips needed to flip pancakes
 // so happy face (+) is right side up. Reads left to right.
-func HappyFlips(pancakes string) (int, error) {
-	chars := []byte(pancakes)
+func HappyFlips(stack string) (int, error) {
+	pancakes := []byte(stack)
 
 	// position of the flip
 	var flips int
 	var nextPancake byte
+	var err error
 
 TraversePancakes:
 	for {
-		debugf("\nGiven %s\n", chars)
-		for i := range chars {
+		debugf("\nGiven %s\n", pancakes)
+		for i := range pancakes {
+			// validate pancake
+			err = validatePancake(pancakes[i])
+			if err != nil {
+				return -1, err
+			}
 
-			if i < len(chars)-1 {
-				nextPancake = chars[i+1]
+			// Find next pancake. If at the end of the slice, cap it off
+			// with a fake happy pancake.
+			if i < len(pancakes)-1 {
+				nextPancake = pancakes[i+1]
 			} else {
 				nextPancake = Happy
 			}
 
-			debugf("i: %d nextPancake: %c, currPancake: %c\n", i, nextPancake, chars[i])
+			debugf("i: %d, nextPancake: %c, currPancake: %c\n", i, nextPancake, pancakes[i])
 			// if we hit a sad pancake
-			if chars[i] == Sad && nextPancake == Happy {
+			if pancakes[i] == Sad && nextPancake == Happy {
 				debugf("Stopping at i: %d, flips: %d\n", i, flips)
 
 				// Determine end of subslice to flip
 				var end int
-				if len(chars) <= 1 {
-					end = len(chars)
+				if len(pancakes) <= 1 {
+					end = len(pancakes)
 				} else {
 					end = i + 1
 				}
 
-				debugf("Flipping %s\n", chars[:end])
-				err := FlipPancakes(chars[:end])
-
-				if err != nil {
-					debugf("Got an error: %s\n", err)
-					return -1, err
-				}
+				debugf("Flipping %s\n", pancakes[:end])
+				FlipPancakes(pancakes[:end])
 
 				// reset
 				flips++
-				debugf("Trying again with %s\n", chars)
+				debugf("Trying again with %s\n", pancakes)
 				continue TraversePancakes
 			}
 		}
@@ -108,6 +116,7 @@ func main() {
 
 		flips, err := HappyFlips(text)
 
+		debugf("Got an error: %s\n", err)
 		if err != nil {
 			debugf("Got an error: %s\n", err)
 			continue
